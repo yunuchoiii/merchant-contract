@@ -1,6 +1,7 @@
 import { Assets, FixedBottomCTA, Flex, NavigationBar, Spacing, TextFieldLine, Toast, Top } from 'ishopcare-lib';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
+import { useToast } from '../hooks/useToast';
 import { updateBasic, useContractFormStore } from '../store/contractForm';
 import { formatPhoneNumber, isValidEmail } from '../utils/form';
 
@@ -19,13 +20,8 @@ export function BasicInfoPage() {
   const setContractForm = useContractFormStore.setState;
   const { name, phone, email } = contractForm.basic;
 
-  // Error Toast 상태 관리
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: '' });
-
-  // Error Toast 닫기 핸들러
-  const handleCloseToast = useCallback(() => {
-    setToast((prev) => ({ ...prev, isOpen: false }));
-  }, []);
+  // 토스트 상태 관리
+  const { openToast, toastProps } = useToast();
 
   // 휴대폰 번호 변경 핸들러
   const handlePhoneChange = useCallback(
@@ -41,23 +37,23 @@ export function BasicInfoPage() {
   // 다음 버튼 클릭 핸들러
   const handleNext = useCallback(() => {
     if (!name?.trim()) {
-      setToast({ isOpen: true, message: VALIDATION_MESSAGES.name });
+      openToast(VALIDATION_MESSAGES.name);
       return;
     }
     if (!phone?.trim()) {
-      setToast({ isOpen: true, message: VALIDATION_MESSAGES.phone });
+      openToast(VALIDATION_MESSAGES.phone);
       return;
     }
     if (!email?.trim()) {
-      setToast({ isOpen: true, message: VALIDATION_MESSAGES.emailEmpty });
+      openToast(VALIDATION_MESSAGES.emailEmpty);
       return;
     }
     if (!isEmailValid) {
-      setToast({ isOpen: true, message: VALIDATION_MESSAGES.emailInvalid });
+      openToast(VALIDATION_MESSAGES.emailInvalid);
       return;
     }
     navigate('/merchant-info');
-  }, [name, phone, email, isEmailValid, navigate]);
+  }, [name, phone, email, isEmailValid, navigate, openToast]);
 
   return (
     <>
@@ -91,13 +87,7 @@ export function BasicInfoPage() {
       <FixedBottomCTA aria-label="다음 버튼" onClick={handleNext}>
         다음
       </FixedBottomCTA>
-      <Toast
-        isOpen={toast.isOpen}
-        close={handleCloseToast}
-        message={toast.message}
-        type="warn"
-        delay={3000}
-      />
+      <Toast {...toastProps} />
     </>
   );
 }

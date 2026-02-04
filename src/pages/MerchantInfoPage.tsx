@@ -13,6 +13,7 @@ import {
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useRedirectIfPrevStepIncomplete } from '../hooks/useRedirectIfPrevStepIncomplete';
+import { useToast } from '../hooks/useToast';
 import { updateMerchant, useContractFormStore } from '../store/contractForm';
 import { formatBusinessNumber, getBusinessNumberDigits } from '../utils/form';
 
@@ -41,18 +42,12 @@ export function MerchantInfoPage() {
   // 주소 표기
   const addressDisplay = useMemo(() => getAddressDisplay(address), [address]);
 
-  // Error Toast 상태 관리
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: '' });
+  const { openToast, toastProps } = useToast();
 
   // 제출 상태 관리
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useRedirectIfPrevStepIncomplete('/merchant-info');
-
-  // Error Toast 닫기 핸들러
-  const handleCloseToast = useCallback(() => {
-    setToast((prev) => ({ ...prev, isOpen: false }));
-  }, []);
 
   // 주소 유효성 검사
   const hasAddress = Boolean(addressDisplay.trim());
@@ -66,19 +61,19 @@ export function MerchantInfoPage() {
   // 다음 버튼 클릭 핸들러
   const handleNext = useCallback(async () => {
     if (!name?.trim()) {
-      setToast({ isOpen: true, message: VALIDATION_MESSAGES.storeName });
+      openToast(VALIDATION_MESSAGES.storeName);
       return;
     }
     if (!businessNumber?.trim()) {
-      setToast({ isOpen: true, message: VALIDATION_MESSAGES.businessNumber });
+      openToast(VALIDATION_MESSAGES.businessNumber);
       return;
     }
     if (!hasAddress) {
-      setToast({ isOpen: true, message: VALIDATION_MESSAGES.address });
+      openToast(VALIDATION_MESSAGES.address);
       return;
     }
     if (!address.details?.trim()) {
-      setToast({ isOpen: true, message: VALIDATION_MESSAGES.addressDetails });
+      openToast(VALIDATION_MESSAGES.addressDetails);
       return;
     }
 
@@ -99,14 +94,14 @@ export function MerchantInfoPage() {
       navigate('/business-info');
     } catch (e) {
       if (isHttpError(e) && e.code === 'MERCHANT_CONFLICTED') {
-        setToast({ isOpen: true, message: MERCHANT_CONFLICTED_MESSAGE });
+        openToast(MERCHANT_CONFLICTED_MESSAGE);
       } else {
-        setToast({ isOpen: true, message: '확인에 실패했어요. 다시 시도해 주세요.' });
+        openToast('확인에 실패했어요. 다시 시도해 주세요.');
       }
     } finally {
       setIsSubmitting(false);
     }
-  }, [name, businessNumber, hasAddress, address, navigate]);
+  }, [name, businessNumber, hasAddress, address, navigate, openToast]);
 
   const handleBusinessNumberChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,13 +152,7 @@ export function MerchantInfoPage() {
       >
         다음
       </FixedBottomCTA>
-      <Toast
-        isOpen={toast.isOpen}
-        close={handleCloseToast}
-        message={toast.message}
-        type="warn"
-        delay={3000}
-      />
+      <Toast {...toastProps} />
     </>
   );
 }

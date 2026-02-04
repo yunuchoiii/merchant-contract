@@ -12,15 +12,22 @@ function formatAddressLine(item: { city: string; state: string; street: string }
 
 export function AddressPage() {
   const navigate = useNavigate();
+
+  // Form 전역 상태 관리
   const setContractForm = useContractFormStore.setState;
   const currentAddress = useContractFormStore((s) => s.merchant.address);
 
+  // 이전 단계 폼이 비어 있으면 해당 단계 페이지로 replace 리다이렉트
   useRedirectIfPrevStepIncomplete('/address');
 
+  // 주소 검색 쿼리 상태 관리
   const [searchQuery, setSearchQuery] = useState('');
+  // 주소 검색 결과 상태 관리
   const [results, setResults] = useState<AddressSearchItem[]>([]);
+  // 주소 검색 로딩 상태 관리
   const [isLoading, setIsLoading] = useState(false);
 
+  // 주소 검색
   useEffect(() => {
     if (!searchQuery.trim()) {
       setResults([]);
@@ -47,6 +54,7 @@ export function AddressPage() {
     };
   }, [searchQuery]);
 
+  // 주소 선택 핸들러
   const handleSelectAddress = useCallback(
     (item: AddressSearchItem) => {
       updateMerchant(setContractForm, {

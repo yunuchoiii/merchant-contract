@@ -15,6 +15,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useRedirectIfPrevStepIncomplete } from '../hooks/useRedirectIfPrevStepIncomplete';
+import { useToast } from '../hooks/useToast';
 import { defaultContractForm, useContractFormStore } from '../store/contractForm';
 import type { BusinessCategoryItem } from '../types/contracts';
 import { getBusinessNumberDigits, getPhoneDigits } from '../utils/form';
@@ -32,11 +33,14 @@ export function BusinessInfoPage() {
   const [categories, setCategories] = useState<BusinessCategoryItem[]>([]);
   // 업종 목록 로딩 상태 관리
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
-  // Error Toast 상태 관리
-  const [toast, setToast] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: '' });
+
+  // 토스트 상태 관리
+  const { openToast, toastProps } = useToast();
+
   // 제출 상태 관리
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // 이전 단계 폼이 비어 있으면 해당 단계 페이지로 replace 리다이렉트
   useRedirectIfPrevStepIncomplete('/business-info');
 
   // 선택된 업종 코드
@@ -71,15 +75,10 @@ export function BusinessInfoPage() {
     [setContractForm]
   );
 
-  // Error Toast 닫기 핸들러
-  const handleCloseToast = useCallback(() => {
-    setToast((prev) => ({ ...prev, isOpen: false }));
-  }, []);
-
   // 제출 핸들러
   const handleSubmit = useCallback(async () => {
     if (!selectedCode.trim()) {
-      setToast({ isOpen: true, message: '업종을 선택해 주세요.' });
+      openToast('업종을 선택해 주세요.');
       return;
     }
 
@@ -115,11 +114,11 @@ export function BusinessInfoPage() {
       navigate('/complete');
     } catch (e) {
       const message = isHttpError(e) && e.message ? e.message : SUBMIT_ERROR_MESSAGE;
-      setToast({ isOpen: true, message });
+      openToast(message);
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedCode, contractForm, navigate, setContractForm]);
+  }, [selectedCode, contractForm, navigate, setContractForm, openToast]);
 
   return (
     <>
@@ -156,13 +155,7 @@ export function BusinessInfoPage() {
       >
         제출하기
       </FixedBottomCTA>
-      <Toast
-        isOpen={toast.isOpen}
-        close={handleCloseToast}
-        message={toast.message}
-        type="warn"
-        delay={3000}
-      />
+      <Toast {...toastProps} />
     </>
   );
 }
