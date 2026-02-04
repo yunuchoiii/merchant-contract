@@ -76,6 +76,8 @@ export function BasicInfoPage() {
           placeholder="휴대폰 번호"
           value={phone}
           onChange={handlePhoneChange}
+          inputMode="numeric"
+          maxLength={11}
         />
         <TextFieldLine
           type="email"
