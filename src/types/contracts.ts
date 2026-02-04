@@ -43,3 +43,9 @@ export interface AddressSearchItem {
   state: string;
   zipcode: string;
 }
+
+/** 업종 목록 API 응답 항목 */
+export interface BusinessCategoryItem {
+  value: string;
+  name: string;
+}

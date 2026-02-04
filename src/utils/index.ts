@@ -21,3 +21,7 @@ export const formatBusinessNumber = (value: string): string => {
 /** 포맷된 사업자등록번호에서 숫자만 추출 */
 export const getBusinessNumberDigits = (formatted: string): string =>
   formatted.replace(/\D/g, '').slice(0, 10);
+
+/** 포맷된 휴대폰 번호에서 숫자만 추출 */
+export const getPhoneDigits = (formatted: string): string =>
+  formatted.replace(/\D/g, '').slice(0, 11);

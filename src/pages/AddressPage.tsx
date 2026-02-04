@@ -25,19 +25,20 @@ export function AddressPage() {
     }
     let cancelled = false;
     setIsLoading(true);
-    httpClient
-      .get<AddressSearchItem[]>('/api/addresses', {
-        searchParams: { search: searchQuery.trim() },
-      })
-      .then((data) => {
+
+    (async () => {
+      try {
+        const data = await httpClient.get<AddressSearchItem[]>('/api/addresses', {
+          searchParams: { search: searchQuery.trim() },
+        });
         if (!cancelled) setResults(Array.isArray(data) ? data : []);
-      })
-      .catch(() => {
+      } catch {
         if (!cancelled) setResults([]);
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setIsLoading(false);
-      });
+      }
+    })();
+
     return () => {
       cancelled = true;
     };

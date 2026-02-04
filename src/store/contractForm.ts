@@ -9,7 +9,8 @@ const defaultAddress = {
   details: '',
 } as const;
 
-const defaultContractForm: ContractPayload = {
+/** 폼 초기화 시 사용하는 기본값 (제출 성공 후 등) */
+export const defaultContractForm: ContractPayload = {
   basic: {
     name: '',
     phone: '',
