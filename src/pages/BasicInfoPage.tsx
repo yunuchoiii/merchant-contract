@@ -1,8 +1,64 @@
-import { Assets, Flex, NavigationBar, TextFieldLine, Top, Spacing, FixedBottomCTA } from 'ishopcare-lib';
+import { Assets, FixedBottomCTA, Flex, NavigationBar, Spacing, TextFieldLine, Toast, Top } from 'ishopcare-lib';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { updateBasic, useContractFormStore } from '../store/contractForm';
+import { formatPhoneNumber, isValidEmail } from '../utils';
+
+const VALIDATION_MESSAGES = {
+  name: '이름을 적어주세요.',
+  phone: '휴대폰 번호를 적어주세요.',
+  emailEmpty: '이메일을 적어주세요.',
+  emailInvalid: '올바른 이메일 형식을 입력해주세요.',
+} as const;
 
 export function BasicInfoPage() {
   const navigate = useNavigate();
+
+  // Form 전역 상태 관리
+  const contractForm = useContractFormStore();
+  const setContractForm = useContractFormStore.setState;
+  const { name, phone, email } = contractForm.basic;
+
+  // Error Toast 상태 관리
+  const [toast, setToast] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: '' });
+
+  // Error Toast 닫기 핸들러
+  const handleCloseToast = useCallback(() => {
+    setToast((prev) => ({ ...prev, isOpen: false }));
+  }, []);
+
+  // 휴대폰 번호 변경 핸들러
+  const handlePhoneChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      updateBasic(setContractForm, { phone: formatPhoneNumber(e.target.value) });
+    },
+    [setContractForm]
+  );
+
+  // 이메일 유효성 검사
+  const isEmailValid = !email || isValidEmail(email);
+
+  // 다음 버튼 클릭 핸들러
+  const handleNext = useCallback(() => {
+    if (!name?.trim()) {
+      setToast({ isOpen: true, message: VALIDATION_MESSAGES.name });
+      return;
+    }
+    if (!phone?.trim()) {
+      setToast({ isOpen: true, message: VALIDATION_MESSAGES.phone });
+      return;
+    }
+    if (!email?.trim()) {
+      setToast({ isOpen: true, message: VALIDATION_MESSAGES.emailEmpty });
+      return;
+    }
+    if (!isEmailValid) {
+      setToast({ isOpen: true, message: VALIDATION_MESSAGES.emailInvalid });
+      return;
+    }
+    navigate('/merchant-info');
+  }, [name, phone, email, isEmailValid, navigate]);
+
   return (
     <>
       <NavigationBar left={<Assets.Icon name="icon-arrow-left-mono" shape={{ width: 32, height: 32 }} />} />
@@ -12,17 +68,34 @@ export function BasicInfoPage() {
       />
       <Spacing size={20} />
       <Flex direction="column" css={{ padding: '0 24px', gap: 20 }}>
-        <TextFieldLine placeholder="이름" />
-        <TextFieldLine placeholder="휴대폰 번호" />
-        <TextFieldLine placeholder="이메일" />
+        <TextFieldLine
+          type="text"
+          placeholder="이름"
+          value={name}
+          onChange={(e) => updateBasic(setContractForm, { name: e.target.value })}
+        />
+        <TextFieldLine
+          placeholder="휴대폰 번호"
+          value={phone}
+          onChange={handlePhoneChange}
+        />
+        <TextFieldLine
+          type="email"
+          placeholder="이메일"
+          value={email}
+          onChange={(e) => updateBasic(setContractForm, { email: e.target.value })}
+        />
       </Flex>
-      <FixedBottomCTA
-        onClick={() => {
-          navigate('/merchant-info');
-        }}
-      >
+      <FixedBottomCTA aria-label="다음 버튼" onClick={handleNext}>
         다음
       </FixedBottomCTA>
+      <Toast
+        isOpen={toast.isOpen}
+        close={handleCloseToast}
+        message={toast.message}
+        type="warn"
+        delay={3000}
+      />
     </>
   );
 }
