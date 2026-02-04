@@ -1,6 +1,7 @@
 import { Assets, colors, Flex, httpClient, ListHeader, ListRow, NavigationBar, Spacing, TextFieldLine, Top } from 'ishopcare-lib';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useRedirectIfPrevStepIncomplete } from '../hooks/useRedirectIfPrevStepIncomplete';
 import { updateMerchant, useContractFormStore } from '../store/contractForm';
 import type { AddressSearchItem } from '../types/contracts';
 
@@ -13,6 +14,8 @@ export function AddressPage() {
   const navigate = useNavigate();
   const setContractForm = useContractFormStore.setState;
   const currentAddress = useContractFormStore((s) => s.merchant.address);
+
+  useRedirectIfPrevStepIncomplete('/address');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<AddressSearchItem[]>([]);

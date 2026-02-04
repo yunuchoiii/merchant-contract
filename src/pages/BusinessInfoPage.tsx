@@ -14,9 +14,10 @@ import {
 } from 'ishopcare-lib';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useRedirectIfPrevStepIncomplete } from '../hooks/useRedirectIfPrevStepIncomplete';
 import { defaultContractForm, useContractFormStore } from '../store/contractForm';
 import type { BusinessCategoryItem } from '../types/contracts';
-import { getBusinessNumberDigits, getPhoneDigits } from '../utils';
+import { getBusinessNumberDigits, getPhoneDigits } from '../utils/form';
 
 const SUBMIT_ERROR_MESSAGE = '제출에 실패했어요. 다시 시도해 주세요.';
 
@@ -35,6 +36,8 @@ export function BusinessInfoPage() {
   const [toast, setToast] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: '' });
   // 제출 상태 관리
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useRedirectIfPrevStepIncomplete('/business-info');
 
   // 선택된 업종 코드
   const selectedCode = contractForm.businessCategory ?? '';

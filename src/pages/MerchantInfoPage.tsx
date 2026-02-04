@@ -12,8 +12,9 @@ import {
 } from 'ishopcare-lib';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useRedirectIfPrevStepIncomplete } from '../hooks/useRedirectIfPrevStepIncomplete';
 import { updateMerchant, useContractFormStore } from '../store/contractForm';
-import { formatBusinessNumber, getBusinessNumberDigits } from '../utils';
+import { formatBusinessNumber, getBusinessNumberDigits } from '../utils/form';
 
 const VALIDATION_MESSAGES = {
   storeName: '상호명을 적어주세요.',
@@ -45,6 +46,8 @@ export function MerchantInfoPage() {
 
   // 제출 상태 관리
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useRedirectIfPrevStepIncomplete('/merchant-info');
 
   // Error Toast 닫기 핸들러
   const handleCloseToast = useCallback(() => {

@@ -2,7 +2,7 @@ import { Assets, FixedBottomCTA, Flex, NavigationBar, Spacing, TextFieldLine, To
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { updateBasic, useContractFormStore } from '../store/contractForm';
-import { formatPhoneNumber, isValidEmail } from '../utils';
+import { formatPhoneNumber, isValidEmail } from '../utils/form';
 
 const VALIDATION_MESSAGES = {
   name: '이름을 적어주세요.',
