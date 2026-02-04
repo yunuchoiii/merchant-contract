@@ -16,7 +16,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useRedirectIfPrevStepIncomplete } from '../hooks/useRedirectIfPrevStepIncomplete';
 import { useToast } from '../hooks/useToast';
-import { defaultContractForm, useContractFormStore } from '../store/contractForm';
+import { useContractFormStore } from '../store/contractForm';
 import type { BusinessCategoryItem } from '../types/contracts';
 import { getBusinessNumberDigits, getPhoneDigits } from '../utils/form';
 
@@ -110,7 +110,6 @@ export function BusinessInfoPage() {
         },
       });
 
-      setContractForm(defaultContractForm);
       navigate('/complete');
     } catch (e) {
       const message = isHttpError(e) && e.message ? e.message : SUBMIT_ERROR_MESSAGE;
@@ -118,7 +117,7 @@ export function BusinessInfoPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedCode, contractForm, navigate, setContractForm, openToast]);
+  }, [selectedCode, contractForm, navigate, openToast]);
 
   return (
     <>

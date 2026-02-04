@@ -1,8 +1,16 @@
-import { Flex, Spacing, Top, FixedBottomCTA } from 'ishopcare-lib';
+import { FixedBottomCTA, Flex, Spacing, Top } from 'ishopcare-lib';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { defaultContractForm, useContractFormStore } from '../store/contractForm';
 
 export function CompletePage() {
   const navigate = useNavigate();
+  const setContractForm = useContractFormStore.setState;
+
+  useEffect(() => {
+    setContractForm(defaultContractForm);
+  }, [setContractForm]);
+
   return (
     <>
       <Top title={<Top.TitleParagraph>신청이 완료됐어요!</Top.TitleParagraph>} />

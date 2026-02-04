@@ -83,6 +83,7 @@ export function AddressPage() {
           placeholder="주소"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          autoFocus
         />
       </Flex>
       {searchQuery.trim() && (
