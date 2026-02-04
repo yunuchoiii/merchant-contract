@@ -141,7 +141,13 @@ export function BusinessInfoPage() {
               contents={
                 <ListRow.Texts type="1RowTypeA" top={item.name} topProps={{ color: colors.grey700 }} />
               }
-              right={<Checkbox.Line checked={selectedCode === item.value} size={20} />}
+              right={
+                <Checkbox.Line
+                  checked={selectedCode === item.value}
+                  onChange={() => handleSelectCategory(item.value)}
+                  size={20}
+                />
+              }
               onClick={() => handleSelectCategory(item.value)}
             />
           ))
